@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Users can read/write their own data (settings, etc.)
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Authenticated users (teachers) can read/write quizzes
+    match /quizzes/{quizId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Authenticated users can read/write folders
+    match /folders/{folderId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Anyone can read/write results (for students submitting without login)
+    match /results/{resultId} {
+      allow read, write: if true;
+    }
+  }
+}
